@@ -40,6 +40,10 @@ class KTree:
         
         else:
             indices = np.arange(len(self.train_x))
+            leaf_model = False
+            if d_val == d-1:
+                leaf_model = True 
+
             for mask in masks:
                 indices = indices[mask]
             
@@ -48,7 +52,16 @@ class KTree:
             cluster_label[indices,d_val] = y_pred
 
             tree_index = parent_model_index * k + model_index
-            k_means_models[d_val][tree_index] = tree
+            if not leaf_model:
+                k_means_models[d_val][tree_index] = tree
+            else:
+                indices_arr = []
+                for i in range(k):
+                    mask = y_pred == i
+                    indices_arr.append(indices[mask])    
+                
+                k_means_models[d_val][tree_index] = [tree,indices_arr]
+                
             for i in range(k):
                 mask = y_pred == i
                 new_masks = masks + [mask]
@@ -60,7 +73,32 @@ class KTree:
 
     # Araba için +1, diğerleri için -1. Total değer sıfırdan büyükse araba var deriz
     def find_class_value(self, x, k_means_models, cluster_Label):
-        y = self.train_y
+        model_index = 0
+        parent_index = 0
+        d = cluster_Label.shape[1]
+        k = len(k_means_models[1])
+        x = x.reshape(1,-1)
+
+        for i in range(d-1):
+            model_index = parent_index * k + model_index
+            model = k_means_models[i][model_index]
+            if isinstance(model, KMeans):
+                model = model
+            else:
+                model = model[0]
+
+            parent_index = model_index
+            model_index = model.predict(x)
+
+
+        model_index = parent_index * k + model_index
+        model = k_means_models[d-1][model_index][0]
+        kmodel = model[0]
+        indices_index = int(kmodel.predict(x))
+        indices = model[1][indices_index]
+        print(indices)
+        
+
         
 
 
