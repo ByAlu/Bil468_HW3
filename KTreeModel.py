@@ -167,7 +167,7 @@ class KTree:
         
         
 
-    def validate_frames(self):
+    def validate(self):
         y_true = []
         y_pred = []
 
