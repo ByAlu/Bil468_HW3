@@ -257,7 +257,6 @@ class KTree:
             image = cv2.imread("images/"+path)
             for window in windows:
                 stride = window//2
-                found = False
 
                 for y in range(0, 128 - window + 1, stride):
                     for x in range(0, 128 - window + 1, stride):
@@ -267,7 +266,7 @@ class KTree:
                         mask = class_val == 0
                         class_val[mask] = -1
                         class_val = sum(class_val)                        
-                        if class_val>=0: #sadece ilk bulunanı çiz
+                        if class_val>=0:
                             cv2.rectangle(image, (x, y), (x + window, y + window), (0,255,0), 2)
             image = cv2.resize(image,(480,480))
             cv2.imshow("image", image)
@@ -277,7 +276,7 @@ class KTree:
                 return 
 
             
-    def deneme(self):
+    def validate_features(self):
         y_pred = self.find_class_value(self.val_x)
 
         y_true = self.val_y
